@@ -1,5 +1,4 @@
 # BLAZOR - Faire un CRUD en utilisant Entity Framework Core et une bd PostGreSQL
-_(juste en dessous des badges sympatiques à placer)_
 
 ## Prérequis
 
