@@ -1,0 +1,28 @@
+﻿@page "/deleteMeal"
+@using DemoBlazorServerApp.Data
+@inject IModalService ModalService
+@inject IMealService MealService
+
+    <EditForm Model="@meal" OnSubmit=@FormSubmitted>
+
+        Voulez vous vraiment supprimer ?
+
+        <button type="submit" class="btn btn-primary">Oui</button>
+        <button @onclick="BlazoredModal.Cancel" class="btn btn-secondary">Annuler</button>
+    </EditForm>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; }
+
+    Meal meal = new Meal();
+    [Parameter] public int id { get; set; }
+
+
+    private async void FormSubmitted()
+    {
+        await MealService.DeleteMealAsync(id);
+
+        BlazoredModal.Close(ModalResult.Ok<Meal>(meal));
+
+    }
+}

@@ -1,0 +1,101 @@
+﻿@page "/"
+@using DemoBlazorServerApp.Data
+@inject IModalService Modal
+@inject IMealService MealService
+
+<div class="row">
+    <div class="col-12">
+        <h4><span class="oi oi-list" aria-hidden="true"></span> Liste de plats</h4>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-6">
+        <button @onclick="@(() => AddMeal())" class="btn btn-sm btn-primary"><span class="oi oi-plus" aria-hidden="true"></span> Ajouter plat </button>
+    </div>
+
+</div>
+<br />
+
+@if (meals == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Prix</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var meal in meals)
+            {
+                <tr>
+                    <td>@meal.Name</td>
+                    <td>@meal.Description</td>
+                    <td>@meal.Price $</td>
+                    <th>
+                        <button @onclick="@(() => DeleteMeal(meal.Id))" class="btn btn-sm btn-primary">Delete</button>
+                        | <button @onclick="@(() => EditMeal(meal.Id))" class="btn btn-sm btn-secondary">Edit</button>
+                    </th>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Meal> meals;
+
+    protected override async Task OnInitializedAsync()
+    {
+        meals = await MealService.GetMealsAsync();
+    }
+
+    async Task AddMeal()
+    {
+        var mealModal = Modal.Show<AddMeal>("Ajout de plat");
+        var result = await mealModal.Result;
+
+        if (!result.Cancelled)
+        {
+            meals = await MealService.GetMealsAsync();
+        }
+    }
+
+    async Task DeleteMeal(int id)
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(Meal.Id), id);
+
+        var mealModal = Modal.Show<DeleteMeal>("Suppression de plat", parameters);
+        var result = await mealModal.Result;
+
+        if (!result.Cancelled)
+        {
+            meals = await MealService.GetMealsAsync();
+        }
+    }
+
+    async Task EditMeal(int id)
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(Meal.Id), id);
+
+        var mealModal = Modal.Show<EditMeal>("Mise à jour de plat", parameters);
+        var result = await mealModal.Result;
+
+        if (!result.Cancelled)
+        {
+            meals = await MealService.GetMealsAsync();
+        }
+    }
+
+
+}

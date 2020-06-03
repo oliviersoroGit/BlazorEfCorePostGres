@@ -1,0 +1,47 @@
+﻿@page "/editMeal"
+@using DemoBlazorServerApp.Data
+@inject IModalService ModalService
+@inject IMealService MealService
+
+    <EditForm Model="@meal" OnValidSubmit=@FormSubmitted>
+
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label for="nom">Nom</label><br />
+            <InputText id="nom" @bind-Value="meal.Name" />
+            <ValidationMessage For="@(() => meal.Name)" />
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label><br />
+            <InputTextArea id="description" @bind-Value="meal.Description" />
+        </div>
+        <div class="form-group">
+            <label for="price">Price</label><br />
+            <InputNumber id="price" @bind-Value="meal.Price" />
+            <ValidationMessage For="@(() => meal.Price)" />
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Modifier</button>
+        <button @onclick="BlazoredModal.Cancel" class="btn btn-secondary">Annuler</button>
+    </EditForm>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; }
+
+    Meal meal = new Meal();
+    [Parameter] public int id { get; set; }
+
+    protected async override void OnInitialized()
+    {
+        meal = await MealService.GetMealByIdAsync(id);
+    }
+
+
+    private async void FormSubmitted()
+    {
+        await MealService.UpdateMealAsync(id, meal);
+        BlazoredModal.Close(ModalResult.Ok<Meal>(meal));
+    }
+}
